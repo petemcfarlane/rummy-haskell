@@ -1,3 +1,5 @@
+import Data.List (sort)
+
 data Suit =  Clubs | Diamonds | Hearts | Spades deriving (Eq, Ord, Enum)
 
 instance Show Suit where
@@ -6,28 +8,30 @@ instance Show Suit where
     show Diamonds = "♦"
     show Clubs = "♣"
 
-data Card = Two Suit | Three Suit | Four Suit | Five Suit | Six Suit | Seven Suit | Eight Suit
-            | Nine Suit | Ten Suit | Jack Suit | Queen Suit | King Suit | Ace Suit deriving (Eq, Ord)
+data Rank = Two | Three | Four | Five | Six | Seven | Eight | Nine | Ten
+            | Jack | Queen | King | Ace deriving (Show, Eq, Ord, Enum)
+
+data Card = Card Rank Suit
 
 instance Show Card where
-    show (Ace suit) = "A" ++ show suit
-    show (King suit) = "K" ++ show suit
-    show (Queen suit) = "Q" ++ show suit
-    show (Jack suit) = "J" ++ show suit
-    show (Ten suit) = "10" ++ show suit
-    show (Nine suit) = "9" ++ show suit
-    show (Eight suit) = "8" ++ show suit
-    show (Seven suit) = "7" ++ show suit
-    show (Six suit) = "6" ++ show suit
-    show (Five suit) = "5" ++ show suit
-    show (Four suit) = "4" ++ show suit
-    show (Three suit) = "3" ++ show suit
-    show (Two suit) = "2" ++ show suit
+    show (Card Ace suit) = "A" ++ show suit
+    show (Card King suit) = "K" ++ show suit
+    show (Card Queen suit) = "Q" ++ show suit
+    show (Card Jack suit) = "J" ++ show suit
+    show (Card Ten suit) = "10" ++ show suit
+    show (Card Nine suit) = "9" ++ show suit
+    show (Card Eight suit) = "8" ++ show suit
+    show (Card Seven suit) = "7" ++ show suit
+    show (Card Six suit) = "6" ++ show suit
+    show (Card Five suit) = "5" ++ show suit
+    show (Card Four suit) = "4" ++ show suit
+    show (Card Three suit) = "3" ++ show suit
+    show (Card Two suit) = "2" ++ show suit
 
 type Deck = [Card]
 
 newDeck :: Deck
-newDeck = [r s | s <- [Clubs .. Spades], r <- [Two, Three, Four, Five, Six, Seven, Eight, Nine, Ten, Jack, Queen, King, Ace]]
+newDeck = [Card r s | s <- [Clubs .. Spades], r <- [Two .. Ace]]
 
 shuffleDeck :: Deck -> Deck
 shuffleDeck deck = undefined
@@ -43,12 +47,12 @@ pete = newPlayer "Pete"
 
 deal :: Deck -> (Card, Deck)
 deal [] = error "Empty deck"
-deal (h:t) = (h, t)
+deal (x:xs) = (x, xs)
 
 dealCardToPlayer :: Deck -> Player -> (Deck, Player)
 dealCardToPlayer [] _ = error "Empty deck"
-dealCardToPlayer d (Player name hand) = let (card, newDeck) = deal d
-                    in (newDeck, Player name (card : hand))
+dealCardToPlayer d (Player name hand) = let (card, d') = deal d
+                                         in (d', Player name (card:hand))
 
 dealNCardsToPlayer :: Int -> Deck -> Player -> (Deck, Player)
 dealNCardsToPlayer n d p
@@ -59,34 +63,21 @@ dealNCardsToPlayer n d p
         where (d', p') = dealCardToPlayer d p
 
 cardsInGroup :: [Card] -> Bool
-cardsInGroup [Two _, Two _, Two _] = True
-cardsInGroup [Two _, Two _, Two _, Two _] = True
-cardsInGroup [Three _, Three _, Three _] = True
-cardsInGroup [Three _, Three _, Three _, Three _] = True
-cardsInGroup [Four _, Four _, Four _] = True
-cardsInGroup [Four _, Four _, Four _, Four _] = True
-cardsInGroup [Five _, Five _, Five _] = True
-cardsInGroup [Five _, Five _, Five _, Five _] = True
-cardsInGroup [Six _, Six _, Six _] = True
-cardsInGroup [Six _, Six _, Six _, Six _] = True
-cardsInGroup [Seven _, Seven _, Seven _] = True
-cardsInGroup [Seven _, Seven _, Seven _, Seven _] = True
-cardsInGroup [Eight _, Eight _, Eight _] = True
-cardsInGroup [Eight _, Eight _, Eight _, Eight _] = True
-cardsInGroup [Nine _, Nine _, Nine _] = True
-cardsInGroup [Nine _, Nine _, Nine _, Nine _] = True
-cardsInGroup [Ten _, Ten _, Ten _] = True
-cardsInGroup [Ten _, Ten _, Ten _, Ten _] = True
-cardsInGroup [Jack _, Jack _, Jack _] = True
-cardsInGroup [Jack _, Jack _, Jack _, Jack _] = True
-cardsInGroup [Queen _, Queen _, Queen _] = True
-cardsInGroup [Queen _, Queen _, Queen _, Queen _] = True
-cardsInGroup [King _, King _, King _] = True
-cardsInGroup [King _, King _, King _, King _] = True
-cardsInGroup [Ace _, Ace _, Ace _] = True
-cardsInGroup [Ace _, Ace _, Ace _, Ace _] = True
+cardsInGroup [(Card r1 _), (Card r2 _), (Card r3 _)] = r1 == r2 && r1 == r3
+cardsInGroup [(Card r1 _), (Card r2 _), (Card r3 _), (Card r4 _)] = r1 == r2 && r1 == r3 && r1 == r4
 cardsInGroup _ = False
 
--- cardsInSequence :: [Card] -> Bool
+cardsInSequence :: [Card] -> Bool
+cardsInSequence [(Card r1 s1), (Card r2 s2), (Card r3 s3)] = sameSuit && inSequence
+    where sameSuit = s1 == s2 && s1 == s3
+          inSequence = sorted !! 0 + 1 == sorted !! 1 && sorted !! 1 + 1 == sorted !! 2
+          sorted = map fromEnum $ sort [r1, r2, r3]
+cardsInSequence [(Card r1 s1), (Card r2 s2), (Card r3 s3), (Card r4 s4)] = sameSuit && inSequence
+    where sameSuit = s1 == s2 && s1 == s3 && s1 == s4
+          inSequence = sorted !! 0 + 1 == sorted !! 1 && sorted !! 1 + 1 == sorted !! 2 && sorted !! 2 + 1 == sorted !! 3
+          sorted = map fromEnum $ sort [r1, r2, r3, r4]
+cardsInSequence _ = False
 
--- canMeld :: Hand -> Bool
+
+canMeld :: Hand -> Bool
+canMeld d = undefined
