@@ -29,3 +29,10 @@ type Deck = [Card]
 makeDeck :: Deck
 makeDeck = [r s | s <- [Clubs .. Spades], r <- [Two, Three, Four, Five, Six, Seven, Eight, Nine, Ten, Jack, Queen, King, Ace]]
 
+shuffleDeck :: Deck -> Deck
+shuffleDeck deck = undefined
+
+type Hand = [Card]
+
+data Player = Player { name :: String, hand :: Hand } deriving (Show)
+
