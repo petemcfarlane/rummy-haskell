@@ -26,8 +26,8 @@ instance Show Card where
 
 type Deck = [Card]
 
-makeDeck :: Deck
-makeDeck = [r s | s <- [Clubs .. Spades], r <- [Two, Three, Four, Five, Six, Seven, Eight, Nine, Ten, Jack, Queen, King, Ace]]
+newDeck :: Deck
+newDeck = [r s | s <- [Clubs .. Spades], r <- [Two, Three, Four, Five, Six, Seven, Eight, Nine, Ten, Jack, Queen, King, Ace]]
 
 shuffleDeck :: Deck -> Deck
 shuffleDeck deck = undefined
@@ -36,3 +36,24 @@ type Hand = [Card]
 
 data Player = Player { name :: String, hand :: Hand } deriving (Show)
 
+newPlayer :: String -> Player
+newPlayer name = Player name []
+
+pete = newPlayer "Pete"
+
+deal :: Deck -> (Card, Deck)
+deal [] = error "Empty deck"
+deal (h:t) = (h, t)
+
+dealCardToPlayer :: Deck -> Player -> (Deck, Player)
+dealCardToPlayer [] _ = error "Empty deck"
+dealCardToPlayer d (Player name hand) = let (card, newDeck) = deal d
+                    in (newDeck, Player name (card : hand))
+
+dealNCardsToPlayer :: Int -> Deck -> Player -> (Deck, Player)
+dealNCardsToPlayer n d p
+    | n > length d = error "Not enough cards in deck"
+    | n < 1        = error "Must deal at least once card"
+    | n == 1       = dealCardToPlayer d p
+    | otherwise    = dealNCardsToPlayer (n - 1) d' p'
+        where (d', p') = dealCardToPlayer d p
