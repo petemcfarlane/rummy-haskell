@@ -14,19 +14,58 @@ data Rank = Two | Three | Four | Five | Six | Seven | Eight | Nine | Ten
 data Card = Card Rank Suit
 
 instance Show Card where
-    show (Card Ace suit) = "A" ++ show suit
-    show (Card King suit) = "K" ++ show suit
-    show (Card Queen suit) = "Q" ++ show suit
-    show (Card Jack suit) = "J" ++ show suit
-    show (Card Ten suit) = "10" ++ show suit
-    show (Card Nine suit) = "9" ++ show suit
-    show (Card Eight suit) = "8" ++ show suit
-    show (Card Seven suit) = "7" ++ show suit
-    show (Card Six suit) = "6" ++ show suit
-    show (Card Five suit) = "5" ++ show suit
-    show (Card Four suit) = "4" ++ show suit
+    show (Card Two suit)   = "2" ++ show suit
     show (Card Three suit) = "3" ++ show suit
-    show (Card Two suit) = "2" ++ show suit
+    show (Card Four suit)  = "4" ++ show suit
+    show (Card Five suit)  = "5" ++ show suit
+    show (Card Six suit)   = "6" ++ show suit
+    show (Card Seven suit) = "7" ++ show suit
+    show (Card Eight suit) = "8" ++ show suit
+    show (Card Nine suit)  = "9" ++ show suit
+    show (Card Ten suit)   = "10" ++ show suit
+    show (Card Jack suit)  = "J" ++ show suit
+    show (Card Queen suit) = "Q" ++ show suit
+    show (Card King suit)  = "K" ++ show suit
+    show (Card Ace suit)   = "A" ++ show suit
+
+two :: Suit -> Card
+two s = Card Two s
+
+three :: Suit -> Card
+three s = Card Three s
+
+four :: Suit -> Card
+four s = Card Four s
+
+five :: Suit -> Card
+five s = Card Five s
+
+six :: Suit -> Card
+six s = Card Six s
+
+seven :: Suit -> Card
+seven s = Card Seven s
+
+eight :: Suit -> Card
+eight s = Card Eight s
+
+nine :: Suit -> Card
+nine s = Card Nine s
+
+ten :: Suit -> Card
+ten s = Card Ten s
+
+jack :: Suit -> Card
+jack s = Card Jack s
+
+queen :: Suit -> Card
+queen s = Card Queen s
+
+king :: Suit -> Card
+king s = Card King s
+
+ace :: Suit -> Card
+ace s = Card Ace s
 
 type Deck = [Card]
 
