@@ -6,25 +6,21 @@ instance Show Suit where
     show Diamonds = "♦"
     show Clubs = "♣"
 
-data Rank =  Two | Three | Four | Five | Six | Seven | Eight | Nine | Ten | Jack | Queen | King | Ace deriving (Eq, Ord, Enum)
-
-instance Show Rank where
-    show Two = "2"
-    show Three = "3"
-    show Four = "4"
-    show Five = "5"
-    show Six = "6"
-    show Seven = "7"
-    show Eight = "8"
-    show Nine = "9"
-    show Ten = "10"
-    show Jack = "J"
-    show Queen = "Q"
-    show King = "K"
-    show Ace = "A"
-
-data Card = Card Rank Suit
+data Card = Ace Suit | King Suit | Queen Suit | Jack Suit | Ten Suit | Nine Suit | Eight Suit
+            | Seven Suit | Six Suit | Five Suit | Four Suit | Three Suit | Two Suit
 
 instance Show Card where
-    show (Card rank suit) = show rank ++ show suit
+    show (Ace suit) = "A" ++ show suit
+    show (King suit) = "K" ++ show suit
+    show (Queen suit) = "Q" ++ show suit
+    show (Jack suit) = "J" ++ show suit
+    show (Ten suit) = "10" ++ show suit
+    show (Nine suit) = "9" ++ show suit
+    show (Eight suit) = "8" ++ show suit
+    show (Seven suit) = "7" ++ show suit
+    show (Six suit) = "6" ++ show suit
+    show (Five suit) = "5" ++ show suit
+    show (Four suit) = "4" ++ show suit
+    show (Three suit) = "3" ++ show suit
+    show (Two suit) = "2" ++ show suit
 
