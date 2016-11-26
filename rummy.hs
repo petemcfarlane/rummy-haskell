@@ -1,4 +1,4 @@
-data Suit = Spades | Hearts | Diamonds | Clubs deriving (Eq, Ord, Enum)
+data Suit =  Clubs | Diamonds | Hearts | Spades deriving (Eq, Ord, Enum)
 
 instance Show Suit where
     show Spades = "♠"
@@ -6,8 +6,8 @@ instance Show Suit where
     show Diamonds = "♦"
     show Clubs = "♣"
 
-data Card = Ace Suit | King Suit | Queen Suit | Jack Suit | Ten Suit | Nine Suit | Eight Suit
-            | Seven Suit | Six Suit | Five Suit | Four Suit | Three Suit | Two Suit
+data Card = Two Suit | Three Suit | Four Suit | Five Suit | Six Suit | Seven Suit | Eight Suit
+            | Nine Suit | Ten Suit | Jack Suit | Queen Suit | King Suit | Ace Suit deriving (Eq, Ord)
 
 instance Show Card where
     show (Ace suit) = "A" ++ show suit
@@ -23,4 +23,9 @@ instance Show Card where
     show (Four suit) = "4" ++ show suit
     show (Three suit) = "3" ++ show suit
     show (Two suit) = "2" ++ show suit
+
+type Deck = [Card]
+
+makeDeck :: Deck
+makeDeck = [r s | s <- [Clubs .. Spades], r <- [Two, Three, Four, Five, Six, Seven, Eight, Nine, Ten, Jack, Queen, King, Ace]]
 
