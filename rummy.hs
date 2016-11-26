@@ -57,3 +57,36 @@ dealNCardsToPlayer n d p
     | n == 1       = dealCardToPlayer d p
     | otherwise    = dealNCardsToPlayer (n - 1) d' p'
         where (d', p') = dealCardToPlayer d p
+
+cardsInGroup :: [Card] -> Bool
+cardsInGroup [Two _, Two _, Two _] = True
+cardsInGroup [Two _, Two _, Two _, Two _] = True
+cardsInGroup [Three _, Three _, Three _] = True
+cardsInGroup [Three _, Three _, Three _, Three _] = True
+cardsInGroup [Four _, Four _, Four _] = True
+cardsInGroup [Four _, Four _, Four _, Four _] = True
+cardsInGroup [Five _, Five _, Five _] = True
+cardsInGroup [Five _, Five _, Five _, Five _] = True
+cardsInGroup [Six _, Six _, Six _] = True
+cardsInGroup [Six _, Six _, Six _, Six _] = True
+cardsInGroup [Seven _, Seven _, Seven _] = True
+cardsInGroup [Seven _, Seven _, Seven _, Seven _] = True
+cardsInGroup [Eight _, Eight _, Eight _] = True
+cardsInGroup [Eight _, Eight _, Eight _, Eight _] = True
+cardsInGroup [Nine _, Nine _, Nine _] = True
+cardsInGroup [Nine _, Nine _, Nine _, Nine _] = True
+cardsInGroup [Ten _, Ten _, Ten _] = True
+cardsInGroup [Ten _, Ten _, Ten _, Ten _] = True
+cardsInGroup [Jack _, Jack _, Jack _] = True
+cardsInGroup [Jack _, Jack _, Jack _, Jack _] = True
+cardsInGroup [Queen _, Queen _, Queen _] = True
+cardsInGroup [Queen _, Queen _, Queen _, Queen _] = True
+cardsInGroup [King _, King _, King _] = True
+cardsInGroup [King _, King _, King _, King _] = True
+cardsInGroup [Ace _, Ace _, Ace _] = True
+cardsInGroup [Ace _, Ace _, Ace _, Ace _] = True
+cardsInGroup _ = False
+
+-- cardsInSequence :: [Card] -> Bool
+
+-- canMeld :: Hand -> Bool
