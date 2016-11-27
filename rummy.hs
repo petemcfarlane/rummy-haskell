@@ -1,4 +1,4 @@
-import Data.List (sort)
+import Data.List (sort, permutations, tails, (\\))
 
 data Suit =  Clubs | Diamonds | Hearts | Spades deriving (Eq, Ord, Enum)
 
@@ -11,7 +11,7 @@ instance Show Suit where
 data Rank = Two | Three | Four | Five | Six | Seven | Eight | Nine | Ten
             | Jack | Queen | King | Ace deriving (Show, Eq, Ord, Enum)
 
-data Card = Card Rank Suit
+data Card = Card Rank Suit deriving (Eq)
 
 instance Show Card where
     show (Card Two suit)   = "2" ++ show suit
@@ -117,6 +117,23 @@ cardsInSequence [(Card r1 s1), (Card r2 s2), (Card r3 s3), (Card r4 s4)] = sameS
           sorted = map fromEnum $ sort [r1, r2, r3, r4]
 cardsInSequence _ = False
 
+combinations :: Int -> [a] -> [[a]]
+combinations 0 _  = [[]]
+combinations n xs = [ y:ys | y:xs' <- tails xs, ys <- combinations (n-1) xs']
+
+combinationsOfHand :: Hand -> [Hand]
+combinationsOfHand = combinations 7
+
+isWinning :: [Card] -> Bool
+isWinning cards = cardsInSequence cards || cardsInGroup cards
 
 canMeld :: Hand -> Bool
-canMeld d = undefined
+canMeld hand = let combinationsOf7 = combinationsOfHand hand
+                   winningCombinations hand' = [ (four, three)
+                                               | four <- combinations 4 hand'
+                                               , let three = hand' \\ four
+                                               , isWinning four
+                                               , isWinning three
+                                               ]
+                   solutionExists  = \h -> (length $ winningCombinations h) >= 1
+                in any solutionExists combinationsOf7
