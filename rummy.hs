@@ -1,4 +1,9 @@
 import Data.List (sort, permutations, tails, (\\))
+import System.Random
+import Data.Array.ST
+import Control.Monad
+import Control.Monad.ST
+import Data.STRef
 
 data Suit =  Clubs | Diamonds | Hearts | Spades deriving (Eq, Ord, Enum)
 
@@ -72,9 +77,6 @@ type Deck = [Card]
 newDeck :: Deck
 newDeck = [Card r s | s <- [Clubs .. Spades], r <- [Two .. Ace]]
 
-shuffleDeck :: Deck -> Deck
-shuffleDeck deck = undefined
-
 type Hand = [Card]
 
 data Player = Player { name :: String, hand :: Hand } deriving (Show)
@@ -137,3 +139,35 @@ canMeld hand = let combinationsOf7 = combinationsOfHand hand
                                                ]
                    solutionExists  = \h -> (length $ winningCombinations h) >= 1
                 in any solutionExists combinationsOf7
+
+-- | Randomly shuffle a list without the IO Monad
+--   /O(N)/
+shuffle' :: [a] -> StdGen -> ([a],StdGen)
+shuffle' xs gen = runST (do
+        g <- newSTRef gen
+        let randomRST lohi = do
+              (a,s') <- liftM (randomR lohi) (readSTRef g)
+              writeSTRef g s'
+              return a
+        ar <- newArray n xs
+        xs' <- forM [1..n] $ \i -> do
+                j <- randomRST (i,n)
+                vi <- readArray ar i
+                vj <- readArray ar j
+                writeArray ar j vi
+                return vj
+        gen' <- readSTRef g
+        return (xs',gen'))
+  where
+    n = length xs
+    newArray :: Int -> [a] -> ST s (STArray s Int a)
+    newArray n xs =  newListArray (1,n) xs
+
+shuffleIO :: [a] -> IO [a]
+shuffleIO xs = getStdRandom (shuffle' xs)
+
+shuffleDeck :: Deck -> Int -> Deck
+shuffleDeck deck seed = fst $ shuffle' deck $ mkStdGen seed
+
+out :: Hand -> IO ()
+out h = putStrLn $ if canMeld h then "Win " ++ show h else "Fail " ++ show h
