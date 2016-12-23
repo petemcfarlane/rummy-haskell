@@ -1,3 +1,5 @@
+module Rummy where
+
 import Data.List (sort, permutations, tails, (\\))
 import System.Random
 import Data.Array.ST
@@ -6,17 +8,16 @@ import Control.Monad.ST
 import Data.STRef
 
 data Suit =  Clubs | Diamonds | Hearts | Spades deriving (Eq, Ord, Enum)
-
-instance Show Suit where
-    show Spades = "♠"
-    show Hearts = "♥"
-    show Diamonds = "♦"
-    show Clubs = "♣"
-
 data Rank = Two | Three | Four | Five | Six | Seven | Eight | Nine | Ten
             | Jack | Queen | King | Ace deriving (Show, Eq, Ord, Enum)
 
 data Card = Card Rank Suit deriving (Eq)
+type Deck = [Card]
+type Hand = [Card]
+type PickupCard = Hand -> Card -> Hand
+type Deal = Deck -> (Card, Deck)
+data Player = Player { name :: String, hand :: Hand } deriving (Show)
+type Discard = Hand -> Int -> Deck -> (Hand, Deck)
 
 instance Show Card where
     show (Card Two suit)   = "2" ++ show suit
@@ -33,62 +34,26 @@ instance Show Card where
     show (Card King suit)  = "K" ++ show suit
     show (Card Ace suit)   = "A" ++ show suit
 
-two :: Suit -> Card
-two s = Card Two s
-
-three :: Suit -> Card
-three s = Card Three s
-
-four :: Suit -> Card
-four s = Card Four s
-
-five :: Suit -> Card
-five s = Card Five s
-
-six :: Suit -> Card
-six s = Card Six s
-
-seven :: Suit -> Card
-seven s = Card Seven s
-
-eight :: Suit -> Card
-eight s = Card Eight s
-
-nine :: Suit -> Card
-nine s = Card Nine s
-
-ten :: Suit -> Card
-ten s = Card Ten s
-
-jack :: Suit -> Card
-jack s = Card Jack s
-
-queen :: Suit -> Card
-queen s = Card Queen s
-
-king :: Suit -> Card
-king s = Card King s
-
-ace :: Suit -> Card
-ace s = Card Ace s
-
-type Deck = [Card]
+instance Show Suit where
+    show Spades = "♠"
+    show Hearts = "♥"
+    show Diamonds = "♦"
+    show Clubs = "♣"
 
 newDeck :: Deck
-newDeck = [Card r s | s <- [Clubs .. Spades], r <- [Two .. Ace]]
-
-type Hand = [Card]
-
-data Player = Player { name :: String, hand :: Hand } deriving (Show)
+newDeck = [Card r s | s <- [Clubs .. ], r <- [Two .. ]]
 
 newPlayer :: String -> Player
 newPlayer name = Player name []
 
 pete = newPlayer "Pete"
 
-deal :: Deck -> (Card, Deck)
+deal :: Deal
 deal [] = error "Empty deck"
 deal (x:xs) = (x, xs)
+
+pickupCard :: PickupCard
+pickupCard hand card = card : hand
 
 dealCardToPlayer :: Deck -> Player -> (Deck, Player)
 dealCardToPlayer [] _ = error "Empty deck"
@@ -102,6 +67,9 @@ dealNCardsToPlayer n d p
     | n == 1       = dealCardToPlayer d p
     | otherwise    = dealNCardsToPlayer (n - 1) d' p'
         where (d', p') = dealCardToPlayer d p
+
+discard :: Discard
+discard h n d = let c = h !! (n - 1) in (h \\ [c], c:d)
 
 cardsInGroup :: [Card] -> Bool
 cardsInGroup [(Card r1 _), (Card r2 _), (Card r3 _)] = r1 == r2 && r1 == r3
@@ -168,6 +136,3 @@ shuffleIO xs = getStdRandom (shuffle' xs)
 
 shuffleDeck :: Deck -> Int -> Deck
 shuffleDeck deck seed = fst $ shuffle' deck $ mkStdGen seed
-
-out :: Hand -> IO ()
-out h = putStrLn $ if canMeld h then "Win " ++ show h else "Fail " ++ show h
