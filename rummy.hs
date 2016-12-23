@@ -14,10 +14,11 @@ data Rank = Two | Three | Four | Five | Six | Seven | Eight | Nine | Ten
 data Card = Card Rank Suit deriving (Eq)
 type Deck = [Card]
 type Hand = [Card]
-type PickupCard = Hand -> Card -> Hand
+-- type PickupCard = Hand -> Card -> Hand
 type Deal = Deck -> (Card, Deck)
 data Player = Player { name :: String, hand :: Hand } deriving (Show)
 type Discard = Hand -> Int -> Deck -> (Hand, Deck)
+type GameState = (Player, Deck, Deck)
 
 instance Show Card where
     show (Card Two suit)   = "2" ++ show suit
@@ -52,8 +53,8 @@ deal :: Deal
 deal [] = error "Empty deck"
 deal (x:xs) = (x, xs)
 
-pickupCard :: PickupCard
-pickupCard hand card = card : hand
+-- pickupCard :: PickupCard
+-- pickupCard hand card = card : hand
 
 dealCardToPlayer :: Deck -> Player -> (Deck, Player)
 dealCardToPlayer [] _ = error "Empty deck"
@@ -70,6 +71,12 @@ dealNCardsToPlayer n d p
 
 discard :: Discard
 discard h n d = let c = h !! (n - 1) in (h \\ [c], c:d)
+
+showLastDiscarded :: GameState -> String
+showLastDiscarded (_, _, discardPile) = show $ head discardPile
+
+showHand :: GameState -> String
+showHand ((Player _ hand), _, _) = show hand
 
 cardsInGroup :: [Card] -> Bool
 cardsInGroup [(Card r1 _), (Card r2 _), (Card r3 _)] = r1 == r2 && r1 == r3
@@ -97,16 +104,16 @@ combinationsOfHand = combinations 7
 isWinning :: [Card] -> Bool
 isWinning cards = cardsInSequence cards || cardsInGroup cards
 
-canMeld :: Hand -> Bool
-canMeld hand = let combinationsOf7 = combinationsOfHand hand
-                   winningCombinations hand' = [ (four, three)
-                                               | four <- combinations 4 hand'
-                                               , let three = hand' \\ four
-                                               , isWinning four
-                                               , isWinning three
-                                               ]
-                   solutionExists  = \h -> (length $ winningCombinations h) >= 1
-                in any solutionExists combinationsOf7
+canMeld :: Player -> Bool
+canMeld (Player _ hand) = let combinationsOf7 = combinationsOfHand hand
+                              winningCombinations hand' = [ (four, three)
+                                                         | four <- combinations 4 hand'
+                                                         , let three = hand' \\ four
+                                                         , isWinning four
+                                                         , isWinning three
+                                                         ]
+                              solutionExists  = \h -> (length $ winningCombinations h) >= 1
+                          in  any solutionExists combinationsOf7
 
 -- | Randomly shuffle a list without the IO Monad
 --   /O(N)/
@@ -136,3 +143,11 @@ shuffleIO xs = getStdRandom (shuffle' xs)
 
 shuffleDeck :: Deck -> Int -> Deck
 shuffleDeck deck seed = fst $ shuffle' deck $ mkStdGen seed
+
+takeUnknownCard :: GameState -> GameState
+takeUnknownCard (player, deck, discardedPile) = (player', deck', discardedPile)
+                                                where (deck', player') = dealCardToPlayer deck player
+
+takeLastDiscardedCard :: GameState -> GameState
+takeLastDiscardedCard (player, deck, discardedPile) = (player', deck, discardedPile')
+                                                      where (discardedPile', player') = dealCardToPlayer discardedPile player
